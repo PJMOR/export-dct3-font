@@ -12,7 +12,7 @@ void main()
     FILE *flash;
     unsigned long lenFlash;
 
-    flash = fopen("input.fls", "rb");
+    flash = fopen("input", "rb");
     fseek(flash, 0, SEEK_END);
     lenFlash = ftell(flash);
     rewind(flash);
