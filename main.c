@@ -45,12 +45,27 @@ void main()
         //printf("%i\n", fontSpaceBeforeWidth); //num of end chars? before next part starts
         //printf("\n");
     };
-
-    unsigned char fontWeight[fontSizeNum][2];
+    char folderName[fontSizeNum][19];
     for (i = 0; i < fontSizeNum; i++)
     {
-        fontWeight[i][0] = (bytesFlash[fontChunkStart + 28 + 44 * i]);
-        fontWeight[i][1] = (bytesFlash[fontChunkStart + 39 + 44 * i]);
+        k = 0;
+        for (j = 0; j < 17; j++)
+        {
+            folderName[i][2 + j] = 0;
+            
+            if (bytesFlash[fontChunkStart + 28 + j + 44 * i] > 0)
+            {
+                folderName[i][2 + j - k] = bytesFlash[fontChunkStart + 28 + j + 44 * i];
+            }
+            else
+            {
+                k++;
+            }
+        }
+        folderName[i][0] = 0x2E;
+        folderName[i][1] = 0x2F;
+        //printf("%s\n", folderName[i]);
+        mkdir(folderName[i], 0777);
     }
 
     unsigned short count = 0;
@@ -65,7 +80,7 @@ void main()
 
     unsigned long fontWidthStart = fontChunkStart + fontCharsIndex[fontSizeNum - 1][2] + fontSpaceBeforeWidth * 8;
     unsigned char fontWidthNum = 0;
-    
+
     while (1)
     {
         if (bytesFlash[fontWidthStart + 4 + fontWidthNum * 12] == 0 && bytesFlash[fontWidthStart + 5 + fontWidthNum * 12] == 1 && bytesFlash[fontWidthStart + 6 + fontWidthNum * 12] == 0)
@@ -95,17 +110,15 @@ void main()
 
     unsigned long currentNum;
     bool match;
-    
+
     int firstCharNum[fontWidthNum];
     unsigned short numOfChars[fontWidthNum];
     unsigned short numPerWidth[fontWidthNum];
 
     unsigned short charLocation[fontWidthNum][count];
     unsigned short charName[fontWidthNum][count];
-    unsigned char charFont[fontWidthNum][count];
     unsigned char charWeight[fontWidthNum][count];
     unsigned char charHeight[fontWidthNum][count];
-
     unsigned char charNumPerFont[fontSizeNum];
 
     unsigned char height1;
@@ -162,7 +175,7 @@ void main()
                 for (k = 0; k < fontWidthNum; k++)
                 {
                     match = false;
-                    if (((currentNum - height1) / 4) + 2 == fontWidthInfo[k][1])
+                    if (((currentNum - height1) / 4) + fontWidthInfo[0][1] == fontWidthInfo[k][1])
                     {
                         charLocation[k][0] = 0;
                         firstCharNum[k] = currentNum - height1;
@@ -179,8 +192,7 @@ void main()
                         for (l = 0; l < numOfChars[k]; l++)
                         {
                             charName[k][numPerWidth[k] + l] = (bytesFlash[fontChunkStart + fontCharsIndex[i][0] + j * 8] << 8 | bytesFlash[fontChunkStart + fontCharsIndex[i][0] + 1 + j * 8]) + l;
-                            charFont[k][numPerWidth[k] + l] = fontWeight[i][0];
-                            charWeight[k][numPerWidth[k] + l] = fontWeight[i][1];
+                            charWeight[k][numPerWidth[k] + l] = i;
                             charHeight[k][numPerWidth[k] + l] = height;
                             if (firstCharNum[k] > 0)
                             {
@@ -201,17 +213,16 @@ void main()
 
     char filename[50];
     //mkdir("./column", 0777);
-    mkdir("./output", 0777);
 
     for (i = 0; i < fontWidthNum; i++)
     {
         int multiple = 0;
         unsigned char bitmapMatrix[fontWidthInfo[i][2]][fontWidthInfo[i][1]];
-        /*
-        sprintf(filename, "./column/Font%lx.pbm", fontWidthInfo[i][1]);
-        output = fopen(filename, "wb");
-        fprintf(output, "P1\n %ld\n %ld\n", fontWidthInfo[i][1], fontWidthInfo[i][2]);
-        */
+
+        //sprintf(filename, "./column/Font%lx.pbm", fontWidthInfo[i][1]);
+        //output = fopen(filename, "wb");
+        //fprintf(output, "P1\n %ld\n %ld\n", fontWidthInfo[i][1], fontWidthInfo[i][2]);
+
         for (j = 0; j < fontWidthInfo[i][3]; j += fontWidthInfo[i][1])
         {
             for (k = 0; k < 8; k++)
@@ -233,7 +244,7 @@ void main()
 
         for (l = 0; l < numPerWidth[i]; l++)
         {
-            sprintf(filename, "./output/%c%c_%04x.pbm", charFont[i][l], charWeight[i][l], charName[i][l]);
+            sprintf(filename, "%s/%04x.pbm", folderName[charWeight[i][l]], charName[i][l]);
             output = fopen(filename, "wb");
             fprintf(output, "P1\n %ld\n %d\n", fontWidthInfo[i][1], charHeight[i][l]);
             for (m = 0; m < charHeight[i][l]; m++)
