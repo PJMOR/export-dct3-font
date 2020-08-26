@@ -52,7 +52,7 @@ void main()
         for (j = 0; j < 17; j++)
         {
             folderName[i][2 + j] = 0;
-            
+
             if (bytesFlash[fontChunkStart + 28 + j + 44 * i] > 0)
             {
                 folderName[i][2 + j - k] = bytesFlash[fontChunkStart + 28 + j + 44 * i];
