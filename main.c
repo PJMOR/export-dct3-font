@@ -115,7 +115,7 @@ void main()
     unsigned short numOfChars[fontWidthNum];
     unsigned short numPerWidth[fontWidthNum];
 
-    unsigned short charLocation[fontWidthNum][count];
+    unsigned int charLocation[fontWidthNum][count];
     unsigned short charName[fontWidthNum][count];
     unsigned char charWeight[fontWidthNum][count];
     unsigned char charHeight[fontWidthNum][count];

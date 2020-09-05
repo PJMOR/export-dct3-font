@@ -29,3 +29,5 @@ So far, the following firmwares have been personally tested:
 - 8250 (NSM-3D)
 	- v5.02, langpack K
 	- v6.04, all langpacks
+
+More info can be found [on my website.](https://pjmor.com/extract-nokia-dct3-fonts/)
